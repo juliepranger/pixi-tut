@@ -1,8 +1,7 @@
 var App = function(Peter) {
 
-	this.bunniesToAdd = 5;
+	this.bunniesToAdd = 50;
 	this.bunnies = [];
-	this.bunny;
 
 	this.releaseInterval = 60 * 0.5;
 	this.tick = 0;
@@ -17,26 +16,35 @@ var App = function(Peter) {
 	document.body.appendChild(this.renderer.view);
 
 	this.init();
+	this.animate();
 };
 
 
 App.prototype.init = function() {
-	var self = this;
 	// this.tick++;
 
 	// console.log('this.tick: ', this.tick);
-	
-	console.log('this.bunnies.length: ', this.bunnies.length);
-	console.log('this.bunniesToAdd: ', this.bunniesToAdd);
 
 	do {
-		self.bunny = new Peter();
-		self.bunnies.push(self.bunny);
-		self.stage.addChild(self.bunny);
+		var bunny = new Peter();
+		this.bunnies.push(bunny);
+		this.stage.addChild(bunny);
 	}
 	while (this.bunnies.length < this.bunniesToAdd);
 
+};
+
+
+App.prototype.animate = function() {
 
 	this.renderer.render(this.stage);	
+
+    requestAnimationFrame(this.animate.bind(this));
+
+	for (var i = 0; i < this.bunnies.length; i++) {
+		var bunny = this.bunnies[i];
+		bunny.update();
+	}
+
 
 };

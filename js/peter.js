@@ -1,6 +1,8 @@
 var Peter = function() {
-	console.log(this);
-	this.bunnyTexture = PIXI.Texture.fromImage('bunny.png');
+	var texture = PIXI.Texture.fromImage('../img/bunny.png');
+	
+	PIXI.Sprite.call(this, texture);
+console.log(this);
 	this.maxX = window.innerWidth;
 	this.maxY = window.innerHeight;
 	this.minX = 0;
@@ -11,60 +13,51 @@ var Peter = function() {
 };
 
 
+Peter.constructor = Peter;
+Peter.prototype = Object.create(PIXI.Sprite.prototype);
 
 Peter.prototype.init = function() {
 	
-	this.bunny = new PIXI.Sprite(this.bunnyTexture);
-	this.bunny.anchor.x = this.bunny.anchor.y = 0.5;
-	this.bunny.position.x = this.randomInt(0, window.innerWidth);
-	this.bunny.position.y = this.randomInt(0, window.innerHeight);
-   	this.bunny.speedX = this.randomInt(-10, 10);
-	this.bunny.speedY = this.randomInt(2, 5);
-
-	this.animate();
+	this.anchor.x = this.anchor.y = 0.5;
+	this.position.x = this.randomInt(0, window.innerWidth);
+	this.position.y = this.randomInt(0, window.innerHeight);
+   	this.speedX = this.randomInt(-10, 10);
+	this.speedY = this.randomInt(2, 5);
 
 };
 
+Peter.prototype.update = function() {
 
+	this.rotation += 0.05;
+    this.position.x += this.speedX;
+    this.position.y += this.speedY;
+    this.speedY += this.gravity;
 
-Peter.prototype.animate = function() {
-
-    
-    // requestAnimationFrame(this.animate.bind(this));
-
-	this.bunny.rotation += 0.05;
-    this.bunny.position.x += this.bunny.speedX;
-    this.bunny.position.y += this.bunny.speedY;
-    this.bunny.speedY += this.gravity;
-
-    console.log('THIS PETER: ', this.bunny);
-
-	if (this.bunny.position.x > this.maxX) {
-	    this.bunny.speedX *= -0.85;
-	    this.bunny.position.x = this.maxX;
+	if (this.position.x > this.maxX) {
+	    this.speedX *= -0.85;
+	    this.position.x = this.maxX;
 	}
 
-    else if (this.bunny.position.x < 0) {
-        this.bunny.speedX *= -0.85;
-        this.bunny.position.x = 0;
+    else if (this.position.x < 0) {
+        this.speedX *= -0.85;
+        this.position.x = 0;
     }
 
-	if (this.bunny.position.y > this.maxY) {
-        this.bunny.speedY *= -0.85;
-        this.bunny.position.y = this.maxY;
+	if (this.position.y > this.maxY) {
+        this.speedY *= -0.85;
+        this.position.y = this.maxY;
 
 		if (Math.random() > 0.2) {
-			this.bunny.speedY -= Math.random() * 6;
+			this.speedY -= Math.random() * 6;
 		}
     }
-    else if (this.bunny.position.y < 0) {
-        this.bunny.speedY *= -0.85;
-        this.bunny.position.y = 0;
+    else if (this.position.y < 0) {
+        this.speedY *= -0.85;
+        this.position.y = 0;
     }
-
 };
+
 
 Peter.prototype.randomInt = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 };
-
