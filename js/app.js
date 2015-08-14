@@ -16,6 +16,7 @@ var App = function() {
 		backgroundColor : 0xA2C7A2
 	};
 
+	this.animateBunnies = false;
 	this.interactive = true;
 	this.startButton;
 
@@ -29,80 +30,82 @@ App.prototype.initPixi = function() {
 
 	this.stage = new PIXI.Container();
 	
-	this.startButton = new PIXI.Graphics();
-	this.startButton.beginFill();
-	this.startButton.drawRoundedRect(500, 500, 200, 200, 12);
-	this.startButton.alpha = 0.7;
-	this.startButton.tint = 0xFFFFFF;
-	this.startButton.interactive = true;
-	this.startButton.endFill();
-	this.stage.addChild(this.startButton);
 	this.renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, this.options);
 
 	document.body.appendChild(this.renderer.view);
 	
+	this.addStartButton();
 };
 
 
+App.prototype.addStartButton = function() {
+	this.startButton = new PIXI.Graphics();
+	this.startButton.beginFill(0xFFFFFF);
+	this.startButton.drawRoundedRect(500, 500, 150, 75, 12);
+	this.startButton.endFill();
+	this.startButton.alpha = 0.7;
+	this.startButton.interactive = true;
+	this.stage.addChild(this.startButton);
+
+	this.startButton.on('mousedown', this.beginBunnyTick.bind(this));
+}
+
 App.prototype.animate = function() {
 
-	var self = this;
 
 	this.renderer.render(this.stage);
 
-	this.startButton.on('mousedown', this.beginBunnyTick.bind(this));
+	requestAnimationFrame(this.animate.bind(this));  
+
+	if (this.animateBunnies) {
+
+		this.startButton.clear();
+
+		for (var i = 0; i < this.bunnies.length; i++) {
+			var bunny = this.bunnies[i];
+			bunny.update();
+
+			bunny.speedY += this.gravity;
+
+			if (bunny.position.x > this.maxX) {
+			    bunny.speedX *= -0.85;
+			    bunny.position.x = this.maxX;
+			}
+
+		    else if (bunny.position.x < 0) {
+		        bunny.speedX *= -0.85;
+		        bunny.position.x = 0;
+		    }
+
+			if (bunny.position.y > this.maxY) {
+		        bunny.speedY *= -0.85;
+		        bunny.position.y = this.maxY;
+
+				if (Math.random() > 0.2) {
+					bunny.speedY -= Math.random() * 6;
+				}
+		    }
+		    else if (bunny.position.y < 0) {
+		        bunny.speedY *= -0.85;
+		        bunny.position.y = 0;
+		    }
+		}
+
+		this.tick++;
+
+		if (this.tick === this.releaseInterval) {
+			
+			this.releaseAPeter();
+			this.tick = 0;
+		}
+	}
 
 };
 
 
 App.prototype.beginBunnyTick = function() {
 
-	console.log('GO!');
-
-	this.startButton.clear();
-
-	this.renderer.render(this.stage);
-
-	requestAnimationFrame(this.beginBunnyTick.bind(this));  
-
-	for (var i = 0; i < this.bunnies.length; i++) {
-		var bunny = this.bunnies[i];
-		bunny.update();
-
-		bunny.speedY += this.gravity;
-
-		if (bunny.position.x > this.maxX) {
-		    bunny.speedX *= -0.85;
-		    bunny.position.x = this.maxX;
-		}
-
-	    else if (bunny.position.x < 0) {
-	        bunny.speedX *= -0.85;
-	        bunny.position.x = 0;
-	    }
-
-		if (bunny.position.y > this.maxY) {
-	        bunny.speedY *= -0.85;
-	        bunny.position.y = this.maxY;
-
-			if (Math.random() > 0.2) {
-				bunny.speedY -= Math.random() * 6;
-			}
-	    }
-	    else if (bunny.position.y < 0) {
-	        bunny.speedY *= -0.85;
-	        bunny.position.y = 0;
-	    }
-	}
-
-	this.tick++;
-	this.colorTick++;
-
-	if (this.tick === this.releaseInterval) {
-		
-		this.releaseAPeter();
-		this.tick = 0;
-	}
+	this.animateBunnies = true;
 }
 
 App.prototype.releaseAPeter = function() {		
