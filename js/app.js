@@ -16,6 +16,9 @@ var App = function() {
 		backgroundColor : 0xA2C7A2
 	};
 
+	this.interactive = true;
+	this.startButton;
+
 	this.initPixi();
 	this.animate();
 };
@@ -25,19 +28,42 @@ App.constructor = App;
 App.prototype.initPixi = function() {
 
 	this.stage = new PIXI.Container();
-
+	
+	this.startButton = new PIXI.Graphics();
+	this.startButton.beginFill();
+	this.startButton.drawRoundedRect(500, 500, 200, 200, 12);
+	this.startButton.alpha = 0.7;
+	this.startButton.tint = 0xFFFFFF;
+	this.startButton.interactive = true;
+	this.startButton.endFill();
+	this.stage.addChild(this.startButton);
 	this.renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, this.options);
-	document.body.appendChild(this.renderer.view);
 
+	document.body.appendChild(this.renderer.view);
+	
 };
 
 
 App.prototype.animate = function() {
 
+	var self = this;
+
 	this.renderer.render(this.stage);
 
-    requestAnimationFrame(this.animate.bind(this));
+	this.startButton.on('mousedown', this.beginBunnyTick.bind(this));
 
+};
+
+
+App.prototype.beginBunnyTick = function() {
+
+	console.log('GO!');
+
+	this.startButton.clear();
+
+	this.renderer.render(this.stage);
+
+	requestAnimationFrame(this.beginBunnyTick.bind(this));  
 
 	for (var i = 0; i < this.bunnies.length; i++) {
 		var bunny = this.bunnies[i];
@@ -77,9 +103,7 @@ App.prototype.animate = function() {
 		this.releaseAPeter();
 		this.tick = 0;
 	}
-
-};
-
+}
 
 App.prototype.releaseAPeter = function() {		
 
