@@ -12,8 +12,6 @@ Peter.prototype = Object.create(PIXI.Sprite.prototype);
 
 
 Peter.prototype.update = function() {
-
-	this.rotation += 0.05;
     this.position.x += this.speedX;
     this.position.y += this.speedY;
 

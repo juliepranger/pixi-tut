@@ -1,6 +1,7 @@
 var App = function() {
 
-	this.bunniesToAdd = 100;
+	this.bunniesToAdd = 1;
+	this.fallenBunnies = [];
 	this.bunnies = [];
 	this.gravity = 0.3;
 
@@ -28,6 +29,18 @@ var App = function() {
 		font: "24px Arial",
 		align: "center"
 	};
+
+	this.scoreFormat = {
+		fill: "black",
+		font: "24px Arial",
+		align: "center"		
+	};
+
+	this.canScore = false;
+	this.score = 0;
+	this.scoreLabel = new PIXI.Text("", this.scoreFormat);
+	this.scoreLabel.position.x = 50;
+	this.scoreLabel.position.y = 100;
 
 	this.initPixi();
 	this.animate();
@@ -92,7 +105,7 @@ App.prototype.animate = function() {
 			bunny.positionBottomRightX = bunnyBounds.x + bunnyBounds.width;
 			bunny.positionBottomRightY = bunnyBounds.y + bunnyBounds.height;
 
-			//find multiple positions for slider
+			// find multiple positions for slider
 			this.slider.positionTopLeftX = sliderBounds.x;
 			this.slider.positionTopLeftY = sliderBounds.y;
 			this.slider.positionBottomRightX = sliderBounds.x + sliderBounds.width;
@@ -110,23 +123,6 @@ App.prototype.animate = function() {
 		        bunny.position.x = 0;
 		    }
 
-			if (bunny.position.y > this.maxY) {
-
-				// if the bunny's position overlaps with the slider position, kick it back up
-
-
-
-		  //       bunny.speedY *= -0.85;
-		  //       bunny.position.y = this.maxY;
-
-				// if (Math.random() > 0.2) {
-				// 	bunny.speedY -= Math.random() * 6;
-				// }
-
-				// else remove that bunny, he fell through the cracks
-				this.stage.removeChild(bunny);
-
-		    }
 		    else if (bunny.position.y < 0) {
 		        bunny.speedY *= -0.85;
 		        bunny.position.y = 0;
@@ -134,53 +130,60 @@ App.prototype.animate = function() {
 
 
 		    // COLLIDING ?
-		    // if (bunny.positionBottomRightY >= this.slider.positionTopLeftY) {
 
-		    // 	console.log('bunny is at the same Y position as the slider! DANGER ZONE');
+		    if (bunny.positionBottomRightY >= this.slider.positionTopLeftY) {
 
-		    // 	if (this.slider.positionTopLeftX <= bunny.positionTopLeftX <= this.slider.positionBottomRightX ||
-		    // 		this.slider.positionTopLeftX <= bunny.positionBottomRightX <= this.slider.positionBottomRightX) {
-		    // 		console.log('COLLISION');
-		    // 	}
-		    // }
+		    	if ((bunny.positionTopLeftX >= this.slider.positionTopLeftX &&
+		    		bunny.positionTopLeftX <= this.slider.positionBottomRightX) ||
+		    		(bunny.positionBottomRightX >= this.slider.positionTopLeftX &&
+		    		bunny.positionBottomRightX <= this.slider.positionBottomRightX)) {
 
+		    		// this.canScoreCheck();
 
-		    // NOT COLLIDING
-		    // if (bunny.positionBottomRightY < this.slider.positionTopLeftY ||
-		    // 	bunny.positionTopLeftY < this.slider.positionTopLeftY ||
-		    // 	(bunny.positionTopLeftX && bunny.positionBottomRightX < this.slider.positionTopLeftX) ||
-		    // 	(bunny.positionTopLeftX && bunny.positionBottomRightX > this.slider.positionBottomRightX)) {
-		    // 	console.log('no colliding!');
-		    // } else {
-		    // 	console.log('COLLISION');
-		    // }
-		  //   if (bunny.positionBottomRightX < this.slider.positionTopLeftX ||
-		  //   	this.slider.positionBottomRightX < bunny.positionTopLeftX ||
-		  //   	bunny.positionBottomRightY < this.slider.positionTopLeftY ||
-		  //   	this.slider.positionBottomRightY < bunny.positionTopLeftY) {
-		  //   	return;
-		  //   } else {
-		  //   	console.log('things are happening');
+			        bunny.speedY *= -0.85;
+			        bunny.position.y = this.maxY;
 
-		  //       bunny.speedY *= -0.85;
-		  //       bunny.position.y = this.maxY;
+					if (Math.random() > 0.2) {
+						bunny.speedY -= Math.random() * 6;
+					}
 
-				// if (Math.random() > 0.2) {
-				// 	bunny.speedY -= Math.random() * 6;
-				// }
-		  //   }
+		    		if (this.canScore) {
+		    			console.log('can score now!');
+			    		// you saved the bunny! you go glen coco! +1 for you
+			    		this.scoreLabel.text = this.score++;
+			    		this.canScore = false;	    			
+		    		}
 
+		    	} else if (bunny.position.y > this.maxY) {
+
+		    		// this.canScoreCheck();
+					// else remove that bunny, he fell through the cracks, you lose a point now :/
+					this.scoreLabel.text = this.score--;
+		    		console.log('BUNNY DOWN');
+		    		this.fallenBunnies.push(bunny);
+		    		console.log('fallen bunnies: ', this.fallenBunnies.length);
+					this.stage.removeChild(bunny);		
+		    	}
+		    }
 		}
 
 		this.tick++;
 
-		if (this.tick === this.releaseInterval) {
+		if (this.tick === this.releaseInterval && this.bunnies.length < this.bunniesToAdd) {
 			
 			this.releaseAPeter();
 			this.tick = 0;
 		}
-	}
 
+		// console.log('this.fallenBunnies:', this.fallenBunnies);
+
+		// needs to be if the fallenBunnies == this.bunniesToAdd --> no more bunnies to save!
+		if (this.fallenBunnies >= this.bunniesToAdd) {
+			this.scoreLabel.text = this.score;
+			this.slider.stopMoving();
+			this.animateBunnies = false;
+		}
+	}
 };
 
 
@@ -200,23 +203,33 @@ App.prototype.addGameSlider = function() {
 	this.slider.position.y = window.innerHeight - 100;
 	this.slider.position.z = 101;
 	this.stage.addChild(this.slider);
+	this.stage.addChild(this.scoreLabel);
 
 };
 
 
 App.prototype.releaseAPeter = function() {		
 
+	this.canScore = true;
 	var bunny = new Peter();
 		bunny.position.x = randomInt(0, window.innerWidth);
-		bunny.position.y = randomInt(0, window.innerHeight);
+		bunny.position.y = randomInt(0, window.innerHeight / 4);
 	   	bunny.speedX = randomInt(-10, 10);
 		bunny.speedY = randomInt(2, 5);
 		bunny.tint = randomCol();
 
-
 	this.bunnies.push(bunny);
 	this.stage.addChild(bunny);	
 };
+
+// App.prototype.canScoreCheck = function() {
+// 	var self = this;
+
+	
+// 	setTimeout(function() {
+// 		self.canScore = true;
+// 	}, this.releaseInterval / this.bunniesToAdd);
+// };
 
 
 randomInt = function(min, max) {

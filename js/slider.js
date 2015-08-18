@@ -31,3 +31,8 @@ Slider.prototype.handleMouseMove = function(evt) {
 Slider.prototype.updatePosition = function(x) {
 	this.position.x = this.positionX;
 };
+
+Slider.prototype.stopMoving = function() {
+	console.log('stop plz');
+	this.interactive = false;
+};
