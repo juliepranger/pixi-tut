@@ -1,5 +1,5 @@
 var Slider = function() {
-	var sliderTexture = new PIXI.Texture.fromImage('../img/slider.png');
+	var sliderTexture = new PIXI.Texture.fromImage('./img/slider.png');
 	PIXI.Sprite.call(this, sliderTexture);
 
 	this.initSliderPosition();
