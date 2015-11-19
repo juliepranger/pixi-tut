@@ -1,5 +1,5 @@
 var Peter = function() {
-	var texture = PIXI.Texture.fromImage('../img/bunny.png');
+	var texture = new PIXI.Texture.fromImage('./img/bunny.png');
 	PIXI.Sprite.call(this, texture);
 
 	this.anchor.x = this.anchor.y = 0.5;
@@ -16,4 +16,3 @@ Peter.prototype.update = function() {
     this.position.y += this.speedY;
 
 };
-
