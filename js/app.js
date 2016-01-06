@@ -180,7 +180,7 @@ App.prototype.animate = function() {
 
 				    		if (bunny.canScore === true) {
 					    		// you saved the bunny! you go glen coco! +1 for you
-								this.score += 1;
+								this.score += 2;
 					    		this.scoreLabel.text = this.score;
 					    		bunny.canScore = false;
 
@@ -251,14 +251,14 @@ App.prototype.releaseAPeter = function() {
 
 App.prototype.canScoreCheck = function() {
 
-	if (this.score >= 10 || this.score <= -10) {
+	if (this.score >= 20 || this.score <= -10) {
 		this.animateBunnies = false;
 
 		for (var i = 0; i < this.bunniesToAdd.length; i++) {
 			this.stage.removeChild(this.bunniesToAdd[i]);
 		}
 
-		if (this.score >= 10) {
+		if (this.score >= 20) {
 			this.scoreLabel.text = "YOU WIN!";
 			this.isGameOver = true;
 
