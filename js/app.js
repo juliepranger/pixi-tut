@@ -64,14 +64,14 @@ App.prototype.initPixi = function() {
 App.prototype.addStartButton = function() {
 	this.startButton = new PIXI.Graphics();
 	this.startButton.beginFill(0xFFFFFF);
-	this.startButton.drawRoundedRect(60, 300, 150, 75, 12);
+	this.startButton.drawRoundedRect(50, 300, 150, 75, 12);
 	this.startButton.endFill();
 	this.startButton.alpha = 0.7;
 	this.startButton.interactive = true;
 
 	this.startButtonText = new PIXI.Text('GO', this.format);
 	this.startButtonText.anchor.x = this.startButtonText.anchor.y = 0.5;
-	this.startButtonText.position.x = 135;
+	this.startButtonText.position.x = 125;
 	this.startButtonText.position.y = 340;
 
 	this.stage.addChild(this.startButton);
