@@ -99,6 +99,10 @@ App.prototype.fadeOpacity = function(e) {
 App.prototype.animate = function() {
 
 	this.renderer.render(this.stage);
+	if(this.slider) {
+		this.slider.update();
+	}
+
 
 	for(var i = 0; i < this.fallenBunnies.length; i++)
 	{
@@ -112,9 +116,17 @@ App.prototype.animate = function() {
 
 	if (this.animateBunnies) {
 
+		window.addEventListener('keydown', function(e) {
+			this.slider.handleKeyDown(e);
+		}.bind(this), false);
+
+		window.addEventListener('keyup', function(e) {
+			this.slider.handleKeyUp(e);
+		}.bind(this), false);
+
 		this.startButton.clear();
 		this.startButtonText.text = '';
-		this.slider.updatePosition();
+		// this.slider.updatePosition();
 		var sliderBounds = this.slider.getBounds();
 
 		// find multiple positions for slider
@@ -227,6 +239,7 @@ App.prototype.addGameSlider = function() {
 	this.slider = new Slider();
 
 	this.slider.anchor.x = this.slider.anchor.y = 0.5;
+	this.slider.position.x = window.innerWidth / 2;
 	this.slider.position.y = window.innerHeight - 100;
 	this.slider.position.z = 101;
 	this.stage.addChild(this.slider);
