@@ -16,3 +16,12 @@ Peter.prototype.update = function() {
     this.position.y += this.speedY;
 
 };
+
+Peter.prototype.reset = function() {
+	this.anchor.x = this.anchor.y = 0.5;
+
+	this.position.x = 0;
+	this.position.y = 0;
+	this.speedX = 0;
+	this.speedY = 0;
+}

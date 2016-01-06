@@ -1,13 +1,13 @@
 var App = function() {
 
 	this.bunniesToAdd = 30;
-	this.chances = 5;
 	this.fallenBunnies = [];
 	this.bunnies = [];
 	this.gravity = 0.3;
 
 	this.releaseInterval = 60 * 0.5;
 	this.tick = 0;
+	this.isGameOver = true;
 
 	this.slider;
 
@@ -17,7 +17,7 @@ var App = function() {
 	this.minY = 0;
 
 	this.options = {
-		backgroundColor : 0xA2C7A2
+		backgroundColor : 0xCCCCCC
 	};
 
 	this.animateBunnies = false;
@@ -77,8 +77,23 @@ App.prototype.addStartButton = function() {
 	this.stage.addChild(this.startButton);
 	this.stage.addChild(this.startButtonText);
 
+	this.startButton.on('mouseover', this.fillOpacity.bind(this));
+
+	this.startButton.on('mouseout', this.fadeOpacity.bind(this));
+
 	this.startButton.on('mousedown', this.beginBunnyTick.bind(this));
-}
+};
+
+
+App.prototype.fillOpacity = function(e) {
+	e.target.alpha = 1;
+};
+
+
+App.prototype.fadeOpacity = function(e) {
+	e.target.alpha = 0.7;
+};
+
 
 App.prototype.animate = function() {
 
@@ -137,70 +152,59 @@ App.prototype.animate = function() {
 		        bunny.position.y = 0;
 		    }
 
-
 				// We have added a cool-down to each bunny so we can give it time to move away from the
 				// collision bounds.
 				// Without some cool-down time, the sprite must move outside of the bounds of the slider
 				// within only one frame. Thus is remains at the bounds line, as it is classed as 'always colliding'.
 
-				if(bunny.collisionCoolDown > 0)
-				{
+				if(bunny.collisionCoolDown > 0) {
 					bunny.collisionCoolDown -= 1;
 				}
-				else
-				{
+				else {
 
-			    if (bunny.positionBottomRightY >= this.slider.positionTopLeftY) {
+				    if (bunny.positionBottomRightY >= this.slider.positionTopLeftY) {
 
-			    	if ((bunny.positionTopLeftX >= this.slider.positionTopLeftX &&
-			    		bunny.positionTopLeftX <= this.slider.positionBottomRightX) ||
-			    		(bunny.positionBottomRightX >= this.slider.positionTopLeftX &&
-			    		bunny.positionBottomRightX <= this.slider.positionBottomRightX)) {
+				        if ((bunny.positionTopLeftX >= this.slider.positionTopLeftX &&
+				    		bunny.positionTopLeftX <= this.slider.positionBottomRightX) ||
+				    		(bunny.positionBottomRightX >= this.slider.positionTopLeftX &&
+				    		bunny.positionBottomRightX <= this.slider.positionBottomRightX)) {
 
-			    		// this.canScoreCheck();
+								bunny.collisionCoolDown = 5;
+				        		bunny.speedY *= -0.85;
+								bunny.position.y = this.slider.positionTopLeftY - bunny.height * 0.5;
 
-							bunny.collisionCoolDown = 5;
-			        bunny.speedY *= -0.85;
-							bunny.position.y = this.slider.positionTopLeftY - bunny.height * 0.5;
+								// add some random
+								if (Math.random() > 0.2) {
+									bunny.speedY -= Math.random() * 6;
+								}
 
-							// add some random
-							if (Math.random() > 0.2) {
-								bunny.speedY -= Math.random() * 6;
-							}
-
-			    		if (bunny.canScore === true) {
-			    			console.log('can score now!');
-				    		// you saved the bunny! you go glen coco! +1 for you
+				    		if (bunny.canScore === true) {
+					    		// you saved the bunny! you go glen coco! +1 for you
 								this.score += 1;
-				    		this.scoreLabel.text = this.score;
-				    		bunny.canScore = false;
-			    		}
+					    		this.scoreLabel.text = this.score;
+					    		bunny.canScore = false;
 
-			    	} else if (bunny.position.y >= this.maxY) {
+								this.canScoreCheck();
+				    		}
 
-			    		// this.canScoreCheck();
-						// else remove that bunny, he fell through the cracks, you lose a point now :/
-						this.score -= 1;
-						this.scoreLabel.text = this.score;
-						this.chances--;
+				    	} else if (bunny.position.y >= this.maxY) {
 
-			    		console.log('BUNNY DOWN');
-			    		this.fallenBunnies.push(bunny);
-			    		console.log('fallen bunnies: ', this.fallenBunnies.length);
-			    	}
-			    }
-				}
+							// else remove that bunny, he fell through the cracks, you lose a point now :/
+							this.score -= 1;
+							this.scoreLabel.text = this.score;
+
+				    		this.fallenBunnies.push(bunny);
+
+							this.canScoreCheck();
+				    	}
+				  }
+			}
 		}
-
-		// console.log('this.fallenBunnies:', this.fallenBunnies);
-
-		// needs to be if the fallenBunnies == this.bunniesToAdd --> no more bunnies to save!
-
 	}
 
 	this.tick++;
 
-	if (this.tick >= this.releaseInterval && this.bunnies.length < this.bunniesToAdd) {
+	if (this.tick >= this.releaseInterval && this.bunnies.length < this.bunniesToAdd && this.isGameOver == false) {
 
 		this.releaseAPeter();
 		this.tick = 0;
@@ -214,7 +218,7 @@ App.prototype.animate = function() {
 App.prototype.beginBunnyTick = function() {
 
 	this.animateBunnies = true;
-
+	this.isGameOver = false;
 	this.addGameSlider();
 }
 
@@ -236,7 +240,7 @@ App.prototype.releaseAPeter = function() {
 	var bunny = new Peter();
 			bunny.position.x = randomInt(0, window.innerWidth);
 			bunny.position.y = randomInt(0, window.innerHeight / 4);
-		  bunny.speedX = randomInt(-10, 10);
+		  	bunny.speedX = randomInt(-10, 10);
 			bunny.speedY = randomInt(2, 5);
 			bunny.tint = randomCol();
 			bunny.canScore = true;
@@ -245,15 +249,52 @@ App.prototype.releaseAPeter = function() {
 	this.stage.addChild(bunny);
 };
 
-// App.prototype.canScoreCheck = function() {
-// 	var self = this;
+App.prototype.canScoreCheck = function() {
 
+	if (this.score >= 10 || this.score <= -10) {
+		this.animateBunnies = false;
 
-// 	setTimeout(function() {
-// 		self.canScore = true;
-// 	}, this.releaseInterval / this.bunniesToAdd);
-// };
+		for (var i = 0; i < this.bunniesToAdd.length; i++) {
+			this.stage.removeChild(this.bunniesToAdd[i]);
+		}
 
+		if (this.score >= 10) {
+			this.scoreLabel.text = "YOU WIN!";
+			this.isGameOver = true;
+
+			setTimeout(function() {
+				this.clearStage();
+			}.bind(this), 2000);
+
+		} else if (this.score <= -10) {
+			this.scoreLabel.text = "YOU LOSE!";
+			this.isGameOver = true;
+
+			setTimeout(function() {
+				this.clearStage();
+			}.bind(this), 2000);
+
+		}
+
+	}
+};
+
+App.prototype.clearStage = function() {
+
+	for (var i = 0; i < this.bunnies.length; i++) {
+		var bunny = this.bunnies[i];
+		bunny.reset();
+		this.stage.removeChild(bunny);
+	}
+
+	this.slider.reset();
+	this.stage.removeChild(this.slider);
+	this.score = 0;
+	this.scoreLabel.text = "PLAY AGAIN?";
+
+	this.addStartButton();
+
+};
 
 randomInt = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;

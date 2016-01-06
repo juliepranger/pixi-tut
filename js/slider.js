@@ -33,6 +33,10 @@ Slider.prototype.updatePosition = function(x) {
 };
 
 Slider.prototype.stopMoving = function() {
-	console.log('stop plz');
 	this.interactive = false;
+};
+
+Slider.prototype.reset = function() {
+	this.interactive = false;
+	this.initSliderPosition();
 };
