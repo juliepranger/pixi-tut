@@ -24,7 +24,6 @@ Slider.prototype.handleMouseMove = function(evt) {
 	var newPosition = evt.data.getLocalPosition(this.parent);
 
 	this.positionX = newPosition.x;
-
 	this.updatePosition(this.positionX);
 };
 

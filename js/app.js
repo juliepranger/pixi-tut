@@ -49,6 +49,7 @@ var App = function() {
 
 App.constructor = App;
 
+
 App.prototype.initPixi = function() {
 
 	this.stage = new PIXI.Container();
@@ -113,7 +114,6 @@ App.prototype.animate = function() {
 
 		this.startButton.clear();
 		this.startButtonText.text = '';
-
 		this.slider.updatePosition();
 		var sliderBounds = this.slider.getBounds();
 
@@ -183,7 +183,6 @@ App.prototype.animate = function() {
 								this.score += 2;
 					    		this.scoreLabel.text = this.score;
 					    		bunny.canScore = false;
-
 								this.canScoreCheck();
 				    		}
 
@@ -192,9 +191,7 @@ App.prototype.animate = function() {
 							// else remove that bunny, he fell through the cracks, you lose a point now :/
 							this.score -= 1;
 							this.scoreLabel.text = this.score;
-
 				    		this.fallenBunnies.push(bunny);
-
 							this.canScoreCheck();
 				    	}
 				  }
@@ -204,7 +201,9 @@ App.prototype.animate = function() {
 
 	this.tick++;
 
-	if (this.tick >= this.releaseInterval && this.bunnies.length < this.bunniesToAdd && this.isGameOver == false) {
+	if (this.tick >= this.releaseInterval &&
+		this.bunnies.length < this.bunniesToAdd &&
+		this.isGameOver == false) {
 
 		this.releaseAPeter();
 		this.tick = 0;
